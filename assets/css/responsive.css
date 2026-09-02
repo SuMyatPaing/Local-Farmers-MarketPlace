@@ -1,0 +1,964 @@
+/* ========================================================================== 
+   Farmers Market - Responsive System v4
+   Admin + Vendor + Customer/Public
+
+   Design goals
+   - 100%, 110%, 125% browser zoom: keep the normal desktop navigation.
+   - Around 175% browser zoom: switch Admin/Vendor/Public navigation to hamburger.
+   - Real small screens also use hamburger.
+   - Never create a page-level horizontal scrollbar.
+   - Tables may scroll inside their own card, but scrollbar chrome stays hidden.
+   ========================================================================== */
+
+:root {
+    --fm-admin-sidebar: 176px;
+    --fm-vendor-sidebar: 256px;
+    --fm-page-gap: 14px;
+}
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
+.sidebar-scroll,
+.table-scroll,
+.overflow-x-auto,
+.overflow-y-auto,
+.overflow-auto,
+.reviews-scroll-hidden,
+.orders-scroll-hidden,
+.products-scroll-hidden,
+.events-scroll-hidden,
+.vendor-dashboard-scroll,
+.vendor-scrollbar-hidden {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+img,
+video,
+svg,
+canvas {
+    max-width: 100%;
+}
+
+main,
+section,
+article,
+form,
+div {
+    min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   NORMAL DESKTOP NAVIGATION
+   Keep this layout at 100 / 110 / 125 zoom.
+   Page-specific CSS previously mixed 176px and 256px offsets; normalize them.
+   -------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+    body:not(.fm-compact-nav) #adminSidebar {
+        width: var(--fm-admin-sidebar) !important;
+        transform: translateX(0) !important;
+    }
+
+    body:not(.fm-compact-nav) #adminHeaderMenuButton,
+    body:not(.fm-compact-nav) #closeAdminSidebar,
+    body:not(.fm-compact-nav) #adminSidebarOverlay {
+        display: none !important;
+    }
+
+    body:not(.fm-compact-nav) #adminSidebar ~ div:not(#adminSidebarOverlay),
+    body:not(.fm-compact-nav) .admin-content-shell,
+    body:not(.fm-compact-nav) .admin-users-shell,
+    body:not(.fm-compact-nav) .vendors-shell,
+    body:not(.fm-compact-nav) .cities-shell,
+    body:not(.fm-compact-nav) .markets-shell,
+    body:not(.fm-compact-nav) .categories-shell,
+    body:not(.fm-compact-nav) .events-shell,
+    body:not(.fm-compact-nav) .products-shell,
+    body:not(.fm-compact-nav) .orders-shell,
+    body:not(.fm-compact-nav) .reviews-page-shell {
+        margin-left: var(--fm-admin-sidebar) !important;
+        padding-left: 0 !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    body:not(.fm-compact-nav) #vendorSidebar {
+        width: var(--fm-vendor-sidebar) !important;
+        transform: translateX(0) !important;
+    }
+
+    body:not(.fm-compact-nav) #vendorHeaderMenuButton,
+    body:not(.fm-compact-nav) #closeVendorSidebar,
+    body:not(.fm-compact-nav) #vendorSidebarOverlay {
+        display: none !important;
+    }
+
+    body:not(.fm-compact-nav) #vendorSidebar ~ div:not(#vendorSidebarOverlay) {
+        margin-left: var(--fm-vendor-sidebar) !important;
+        padding-left: 0 !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) .market-desktop-nav,
+    body.market-public-view:not(.fm-compact-nav) .market-desktop-actions {
+        display: flex !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) #marketplaceMobileMenuButton,
+    body.market-public-view:not(.fm-compact-nav) #marketplaceMobileMenu,
+    body.market-public-view:not(.fm-compact-nav) #marketplaceMobileOverlay {
+        display: none !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   MEDIUM DESKTOP / ZOOM-SAFE CONTENT
+   Navigation remains desktop, but dense panels reflow rather than break.
+   This is the important layer for 100%, 110% and 125% on common laptops.
+   -------------------------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1599.98px) {
+    main[class] {
+        max-width: 100% !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    /* Admin KPI cards: auto-fit instead of forcing 4-6 cards into one row. */
+    .admin-stat-grid,
+    .admin-users-stats,
+    .vendors-stats,
+    .cities-stats,
+    .markets-stats,
+    .categories-stats,
+    .events-stats,
+    .products-stats,
+    .orders-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    /* Admin dashboard panels become a stable two-column layout. */
+    .admin-dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    .admin-sales-panel,
+    .admin-orders-week-panel,
+    .admin-approvals-panel,
+    .admin-market-panel,
+    .admin-recent-orders-panel,
+    .admin-reviews-panel {
+        grid-column: auto !important;
+        min-width: 0 !important;
+    }
+
+    .admin-recent-orders-panel {
+        grid-column: span 2 !important;
+    }
+
+    /* Admin filter rows are allowed to wrap into a clean responsive grid. */
+    .admin-users-filter-grid,
+    .vendors-filter-grid,
+    .markets-filter-form,
+    .categories-filter-form,
+    .events-filter-form,
+    .products-filter-form,
+    .orders-filter-form,
+    .reviews-filter-form {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)) !important;
+        gap: 8px !important;
+        align-items: end !important;
+    }
+
+    .admin-users-filter-grid > :first-child,
+    .vendors-filter-grid > :first-child,
+    .markets-filter-form > :first-child,
+    .categories-filter-form > :first-child,
+    .events-filter-form > :first-child,
+    .products-filter-form > :first-child,
+    .orders-filter-form > :first-child,
+    .reviews-filter-form > :first-child {
+        grid-column: span 2 !important;
+    }
+
+    /* Vendor cards and dashboard. */
+    .vendor-dashboard-kpis,
+    .vendor-stats-grid,
+    .vendor-orders-stats {
+        grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .vendor-dashboard-main-grid,
+    .vendor-dashboard-secondary-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 14px !important;
+    }
+
+    .vendor-top-products {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .vendor-filter-grid,
+    .vendor-orders-filter-grid,
+    .vendor-reviews-filter-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    .vendor-filter-grid > :first-child,
+    .vendor-orders-filter-grid > :first-child,
+    .vendor-reviews-filter-grid > :first-child {
+        grid-column: span 2 !important;
+    }
+
+    /* Do not let wide tables move the whole document. */
+    main .overflow-x-auto,
+    main .table-scroll,
+    main .vendor-scrollbar-hidden,
+    main .reviews-scroll-hidden,
+    main .orders-scroll-hidden,
+    main .products-scroll-hidden {
+        max-width: 100% !important;
+        overflow-x: auto !important;
+    }
+
+    /* Public/User pages: keep normal header and gracefully reduce dense grids. */
+    .market-page-products .grid.sm\:grid-cols-2.lg\:grid-cols-3.xl\:grid-cols-4 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .market-page-userdashboard .mt-6.grid.gap-4.sm\:grid-cols-2.xl\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .market-page-userdashboard .mt-6.grid.gap-6.xl\:grid-cols-\[1fr_320px\] {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+/* Slightly tighter medium desktop (common 125% viewports). */
+@media (min-width: 768px) and (max-width: 1299.98px) {
+    .admin-dashboard-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .admin-recent-orders-panel {
+        grid-column: auto !important;
+    }
+
+    .vendor-top-products {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .market-page-index .home-hero-grid {
+        gap: 32px !important;
+    }
+
+    .market-page-index .home-hero-copy h1 {
+        font-size: clamp(2.5rem, 4.8vw, 3.7rem) !important;
+    }
+
+    .market-page-products .grid.sm\:grid-cols-2.lg\:grid-cols-3.xl\:grid-cols-4,
+    .market-page-markets .mt-6.grid.gap-6.md\:grid-cols-2.xl\:grid-cols-3,
+    .market-page-events [class*="grid-cols"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   COMPACT NAVIGATION
+   The class is set by responsive.js for approximately 175% browser zoom,
+   or for genuinely small screens. It is NOT based only on viewport width.
+   -------------------------------------------------------------------------- */
+body.fm-compact-nav #adminSidebar,
+body.fm-compact-nav #vendorSidebar {
+    width: min(86vw, 290px) !important;
+    transform: translateX(-100%) !important;
+    z-index: 80 !important;
+    box-shadow: 18px 0 50px rgba(15, 23, 42, .24);
+}
+
+body.fm-compact-nav #adminSidebar:not(.-translate-x-full),
+body.fm-compact-nav #vendorSidebar:not(.-translate-x-full) {
+    transform: translateX(0) !important;
+}
+
+body.fm-compact-nav #adminHeaderMenuButton,
+body.fm-compact-nav #closeAdminSidebar,
+body.fm-compact-nav #vendorHeaderMenuButton,
+body.fm-compact-nav #closeVendorSidebar {
+    display: grid !important;
+}
+
+body.fm-compact-nav #adminSidebarOverlay,
+body.fm-compact-nav #vendorSidebarOverlay {
+    z-index: 70 !important;
+}
+
+body.fm-compact-nav #adminSidebarOverlay:not(.hidden),
+body.fm-compact-nav #vendorSidebarOverlay:not(.hidden) {
+    display: block !important;
+}
+
+body.fm-compact-nav #adminSidebar ~ div:not(#adminSidebarOverlay),
+body.fm-compact-nav #vendorSidebar ~ div:not(#vendorSidebarOverlay),
+body.fm-compact-nav .admin-content-shell,
+body.fm-compact-nav .admin-users-shell,
+body.fm-compact-nav .vendors-shell,
+body.fm-compact-nav .cities-shell,
+body.fm-compact-nav .markets-shell,
+body.fm-compact-nav .categories-shell,
+body.fm-compact-nav .events-shell,
+body.fm-compact-nav .products-shell,
+body.fm-compact-nav .orders-shell,
+body.fm-compact-nav .reviews-page-shell {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+body.fm-compact-nav .admin-compact-header,
+body.fm-compact-nav #vendorSidebar ~ div header,
+body.fm-compact-nav #vendorSidebar ~ div header > div {
+    min-height: 54px !important;
+    height: 54px !important;
+}
+
+body.fm-compact-nav .admin-compact-header,
+body.fm-compact-nav #vendorSidebar ~ div header > div {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+
+body.fm-compact-nav .admin-profile-name,
+body.fm-compact-nav .admin-profile-role,
+body.fm-compact-nav #adminProfileChevron,
+body.fm-compact-nav #vendorProfileButton > span:nth-child(2),
+body.fm-compact-nav #vendorProfileChevron,
+body.fm-compact-nav #vendorSidebar ~ div header h1 + p,
+body.fm-compact-nav #vendorSidebar ~ div header form[method="get"],
+body.fm-compact-nav #vendorSidebar ~ div header a[title="Open marketplace"] {
+    display: none !important;
+}
+
+/* Public/User compact header + drawer */
+body.market-public-view.fm-compact-nav .market-header-shell {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 110 !important;
+}
+
+body.market-public-view.fm-compact-nav .market-header-inner {
+    min-height: 58px !important;
+    padding: 8px 12px !important;
+    max-width: 100% !important;
+}
+
+body.market-public-view.fm-compact-nav .market-desktop-nav,
+body.market-public-view.fm-compact-nav .market-desktop-actions {
+    display: none !important;
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenuButton {
+    display: grid !important;
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: min(88vw, 360px) !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    z-index: 130 !important;
+    padding: 18px !important;
+    border-top: 0 !important;
+    background: #064e2b !important;
+    color: #ffffff !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    box-shadow: -18px 0 50px rgba(15, 23, 42, .30);
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu:not(.hidden),
+body.market-public-view.fm-compact-nav #marketplaceMobileOverlay:not(.hidden) {
+    display: block !important;
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100 !important;
+    background: rgba(15, 23, 42, .52) !important;
+    backdrop-filter: blur(2px);
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenuClose {
+    display: grid !important;
+}
+
+/* Compact content layouts */
+body.fm-compact-nav main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+
+body.market-public-view.fm-compact-nav .home-hero-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 26px !important;
+    padding-top: 32px !important;
+    padding-bottom: 38px !important;
+}
+
+body.market-public-view.fm-compact-nav .home-hero-copy,
+body.market-public-view.fm-compact-nav .home-hero-media {
+    width: min(100%, 760px) !important;
+    max-width: 760px !important;
+    margin-inline: auto !important;
+}
+
+body.market-public-view.fm-compact-nav .home-hero-copy h1 {
+    font-size: clamp(2.25rem, 6vw, 3.2rem) !important;
+    line-height: 1.08 !important;
+}
+
+body.market-public-view.fm-compact-nav .home-hero-media img,
+body.market-public-view.fm-compact-nav .home-hero-media > div > div.grid {
+    height: 340px !important;
+}
+
+body.market-public-view.fm-compact-nav [class*="lg:grid-cols-["],
+body.market-public-view.fm-compact-nav [class*="xl:grid-cols-["] {
+    grid-template-columns: minmax(0, 1fr) !important;
+}
+
+body.market-public-view.fm-compact-nav [class*="lg:flex-row"],
+body.market-public-view.fm-compact-nav [class*="xl:flex-row"] {
+    flex-direction: column !important;
+}
+
+body.market-public-view.fm-compact-nav.market-page-products [class*="grid-cols"],
+body.market-public-view.fm-compact-nav.market-page-markets [class*="grid-cols"],
+body.market-public-view.fm-compact-nav.market-page-events [class*="grid-cols"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* --------------------------------------------------------------------------
+   TRUE SMALL SCREENS
+   responsive.js also adds fm-compact-nav below 768px.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    main {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .market-brand-copy {
+        display: none !important;
+    }
+
+    body.market-public-view .home-hero-copy h1 {
+        font-size: clamp(2rem, 9vw, 2.7rem) !important;
+    }
+
+    body.market-public-view .home-hero-media img,
+    body.market-public-view .home-hero-media > div > div.grid {
+        height: 260px !important;
+    }
+
+    body.market-public-view [class*="grid-cols"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    main table {
+        min-width: 680px;
+    }
+}
+
+/* ==========================================================================
+   Vendor compact navigation - final fix
+   Single source of truth for the 175%/compact drawer state.
+   ========================================================================== */
+
+body.fm-compact-nav #vendorSidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(86vw, 290px) !important;
+    max-width: 290px !important;
+    transform: translate3d(-100%, 0, 0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 90 !important;
+    transition: transform 0.3s ease !important;
+    will-change: transform;
+}
+
+body.fm-compact-nav #vendorSidebar.vendor-sidebar-open {
+    transform: translate3d(0, 0, 0) !important;
+}
+
+body.fm-compact-nav #vendorSidebarOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 80 !important;
+    background: rgba(15, 23, 42, 0.52) !important;
+    backdrop-filter: blur(2px);
+}
+
+body.fm-compact-nav #vendorSidebarOverlay:not(.hidden) {
+    display: block !important;
+}
+
+body.fm-compact-nav #vendorHeaderMenuButton,
+body.fm-compact-nav #closeVendorSidebar {
+    display: grid !important;
+}
+
+/* Normal desktop: keep sidebar permanently visible. */
+body:not(.fm-compact-nav) #vendorSidebar {
+    transform: translate3d(0, 0, 0) !important;
+}
+
+body:not(.fm-compact-nav) #vendorSidebarOverlay {
+    display: none !important;
+}
+
+/* Public/User drawer text must remain readable above the overlay. */
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu,
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu nav,
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu nav a,
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu .market-nav-link,
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu p,
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu i {
+    color: #ffffff !important;
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu nav a {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu nav a.is-active {
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+}
+
+body.market-public-view.fm-compact-nav #marketplaceMobileMenu nav a:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   USER / PUBLIC ONLY — 100% DESKTOP REFERENCE OVERRIDE
+   --------------------------------------------------------------------------
+   Purpose:
+   - Keep Admin and Vendor responsive behavior untouched.
+   - Make User/Public pages at 100% look closer to the wider 80% desktop view.
+   - Keep normal desktop header at 100/110/125.
+   - Keep the existing 175% fm-compact-nav hamburger behavior unchanged.
+   ========================================================================== */
+
+@media (min-width: 1150px) and (max-width: 1599.98px) {
+
+    /* Public/User pages only */
+    body.market-public-view:not(.fm-compact-nav) {
+        overflow-x: hidden !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) main {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Use more of the available width at 100% instead of shrinking too early. */
+    body.market-public-view:not(.fm-compact-nav) .market-header-inner,
+    body.market-public-view:not(.fm-compact-nav) main > .max-w-7xl,
+    body.market-public-view:not(.fm-compact-nav) main > .max-w-6xl,
+    body.market-public-view:not(.fm-compact-nav) main > .max-w-5xl,
+    body.market-public-view:not(.fm-compact-nav) .max-w-7xl {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: clamp(16px, 2vw, 28px) !important;
+        padding-right: clamp(16px, 2vw, 28px) !important;
+    }
+
+    /* Homepage: keep the same desktop two-column composition seen at 80%. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr) !important;
+        gap: clamp(24px, 3vw, 44px) !important;
+        align-items: center !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy h1 {
+        font-size: clamp(2.65rem, 3.8vw, 4.35rem) !important;
+        line-height: 1.04 !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media img,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > div > div.grid {
+        width: 100% !important;
+        height: clamp(360px, 34vw, 500px) !important;
+        object-fit: cover !important;
+    }
+
+    /* Products: retain the wider 80%-style 4-column desktop grid. */
+    body.market-public-view:not(.fm-compact-nav).market-page-products
+    .grid.sm\:grid-cols-2.lg\:grid-cols-3.xl\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: clamp(14px, 1.5vw, 22px) !important;
+    }
+
+    /* Markets: retain 3 desktop columns. */
+    body.market-public-view:not(.fm-compact-nav).market-page-markets
+    .mt-6.grid.gap-6.md\:grid-cols-2.xl\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: clamp(14px, 1.6vw, 24px) !important;
+    }
+
+    /* Events: keep a desktop multi-column layout instead of collapsing too early. */
+    body.market-public-view:not(.fm-compact-nav).market-page-events [class*="grid-cols"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: clamp(14px, 1.6vw, 24px) !important;
+    }
+
+    /* User dashboard: keep four summary cards where possible. */
+    body.market-public-view:not(.fm-compact-nav).market-page-userdashboard
+    .mt-6.grid.gap-4.sm\:grid-cols-2.xl\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: clamp(12px, 1.4vw, 20px) !important;
+    }
+
+    /* Prevent cards/content from forcing page-level horizontal overflow. */
+    body.market-public-view:not(.fm-compact-nav) .grid > *,
+    body.market-public-view:not(.fm-compact-nav) section,
+    body.market-public-view:not(.fm-compact-nav) article,
+    body.market-public-view:not(.fm-compact-nav) form {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) img,
+    body.market-public-view:not(.fm-compact-nav) video {
+        max-width: 100% !important;
+    }
+}
+
+/* A slightly tighter fallback for smaller 100%-desktop laptop widths.
+   Still User/Public only; Admin/Vendor remain untouched. */
+@media (min-width: 1150px) and (max-width: 1279.98px) {
+    body.market-public-view:not(.fm-compact-nav).market-page-products
+    .grid.sm\:grid-cols-2.lg\:grid-cols-3.xl\:grid-cols-4 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-markets
+    .mt-6.grid.gap-6.md\:grid-cols-2.xl\:grid-cols-3,
+    body.market-public-view:not(.fm-compact-nav).market-page-events [class*="grid-cols"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-userdashboard
+    .mt-6.grid.gap-4.sm\:grid-cols-2.xl\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* ==========================================================================
+   USER / PUBLIC ONLY — FINAL 100% DESKTOP SCALE FIX
+   --------------------------------------------------------------------------
+   Goal:
+   Make browser zoom 100% visually match the cleaner 80% reference:
+   - centered content instead of stretching full width
+   - smaller, balanced hero typography
+   - controlled hero image height
+   - normal desktop header at 100/110/125
+   - Admin/Vendor untouched
+   ========================================================================== */
+
+@media (min-width: 1150px) {
+
+    /* IMPORTANT:
+       The previous User/Public override forced max-w-7xl to 100% width.
+       That is what made the 100% layout look oversized/stretched.
+       Restore a controlled centered desktop container. */
+    body.market-public-view:not(.fm-compact-nav) .market-header-inner,
+    body.market-public-view:not(.fm-compact-nav) .max-w-7xl {
+        width: calc(100% - 32px) !important;
+        max-width: 1280px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) main {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Header: keep the compact, centered 80%-reference feel at 100%. */
+    body.market-public-view:not(.fm-compact-nav) .market-header-inner {
+        min-height: 72px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) .market-desktop-nav {
+        gap: 4px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav) .market-nav-link {
+        padding: 8px 11px !important;
+        font-size: 13px !important;
+    }
+
+    /* Homepage hero */
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-grid {
+        width: calc(100% - 32px) !important;
+        max-width: 1280px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 72px !important;
+        padding-bottom: 72px !important;
+        grid-template-columns: minmax(0, 1.05fr) minmax(460px, .95fr) !important;
+        gap: 54px !important;
+        align-items: center !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy h1 {
+        max-width: 700px !important;
+        font-size: clamp(3rem, 3.55vw, 4rem) !important;
+        line-height: 1.05 !important;
+        letter-spacing: -0.035em !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy > p {
+        max-width: 650px !important;
+        font-size: 16px !important;
+        line-height: 1.85 !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy form {
+        max-width: 650px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media {
+        max-width: 560px !important;
+        justify-self: end !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media img,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > div > div.grid {
+        height: 500px !important;
+        width: 100% !important;
+        object-fit: cover !important;
+    }
+
+    /* Keep floating hero badges proportional. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > .absolute.-left-6 {
+        transform: scale(.92);
+        transform-origin: left center;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > .absolute.-bottom-5 {
+        transform: scale(.92);
+        transform-origin: right bottom;
+    }
+
+    /* Homepage sections should stay centered like the 80% reference. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    section > .mx-auto.max-w-7xl,
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    section.mx-auto.max-w-7xl {
+        width: calc(100% - 32px) !important;
+        max-width: 1280px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* Stats keep 4 columns on normal desktop. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    section.border-y .grid.max-w-7xl {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    /* Featured markets + events = 3 columns on desktop. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    .mt-8.grid.gap-6.lg\:grid-cols-3,
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    .mt-8.grid.gap-5.lg\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    /* Featured products = 4 columns. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    .mt-8.grid.gap-5.sm\:grid-cols-2.xl\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    /* Categories remain dense but balanced. */
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    .mt-10.grid.grid-cols-2.gap-4.sm\:grid-cols-3.lg\:grid-cols-4.xl\:grid-cols-8 {
+        grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+    }
+}
+
+/* Typical 100% laptop / slightly narrower desktop:
+   preserve the same visual language without overflow. */
+@media (min-width: 1150px) and (max-width: 1399.98px) {
+
+    body.market-public-view:not(.fm-compact-nav) .market-header-inner,
+    body.market-public-view:not(.fm-compact-nav) .max-w-7xl,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-grid {
+        width: calc(100% - 28px) !important;
+        max-width: 1180px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(400px, .92fr) !important;
+        gap: 38px !important;
+        padding-top: 58px !important;
+        padding-bottom: 58px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy h1 {
+        font-size: clamp(2.7rem, 3.6vw, 3.45rem) !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media {
+        max-width: 500px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media img,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > div > div.grid {
+        height: 450px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index
+    .mt-10.grid.grid-cols-2.gap-4.sm\:grid-cols-3.lg\:grid-cols-4.xl\:grid-cols-8 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+/* ==========================================================================
+   USER / PUBLIC ONLY — HOMEPAGE FINAL POLISH
+   --------------------------------------------------------------------------
+   Fine-tunes the 100% desktop homepage based on the approved screenshot:
+   - reduce excessive top whitespace
+   - slightly reduce hero image size
+   - preserve two-line heading and normal desktop navigation
+   - Admin/Vendor remain untouched
+   ========================================================================== */
+
+@media (min-width: 1150px) {
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-grid {
+        padding-top: 46px !important;
+        padding-bottom: 58px !important;
+        gap: 48px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy {
+        align-self: center !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy h1 {
+        font-size: clamp(2.9rem, 3.35vw, 3.8rem) !important;
+        line-height: 1.045 !important;
+        max-width: 690px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy > p {
+        margin-top: 18px !important;
+        font-size: 15px !important;
+        line-height: 1.8 !important;
+        max-width: 640px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy form {
+        margin-top: 26px !important;
+        max-width: 650px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media {
+        max-width: 525px !important;
+        align-self: center !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media img,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > div > div.grid {
+        height: 465px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > .absolute.-left-6 {
+        transform: scale(.88) !important;
+        transform-origin: left center !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > .absolute.-bottom-5 {
+        transform: scale(.88) !important;
+        transform-origin: right bottom !important;
+    }
+}
+
+/* Slightly narrower desktop keeps the same visual balance without overflow. */
+@media (min-width: 1150px) and (max-width: 1399.98px) {
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-grid {
+        padding-top: 40px !important;
+        padding-bottom: 50px !important;
+        gap: 34px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-copy h1 {
+        font-size: clamp(2.65rem, 3.25vw, 3.35rem) !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media {
+        max-width: 485px !important;
+    }
+
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media img,
+    body.market-public-view:not(.fm-compact-nav).market-page-index .home-hero-media > div > div.grid {
+        height: 435px !important;
+    }
+}

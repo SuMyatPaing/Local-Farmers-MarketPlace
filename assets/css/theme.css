@@ -1,0 +1,44 @@
+:root {
+    --fm-primary: #16a34a;
+    --fm-primary-dark: #14532d;
+    --fm-sidebar: #123b22;
+    --fm-soft: #dcfce7;
+    --fm-surface: #ffffff;
+    --fm-page: #f7faf6;
+    --fm-border: #dbe7dc;
+}
+
+html { scroll-behavior: smooth; }
+body { background-color: var(--fm-page) !important; }
+::selection { background: #bbf7d0; color: #14532d; }
+
+input, select, textarea, button { font: inherit; }
+input:focus, select:focus, textarea:focus { outline-offset: 1px; }
+
+.sidebar-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.sidebar-scroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* Accessible keyboard focus without changing the existing UI layout. */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+    outline: 2px solid #22c55e;
+    outline-offset: 2px;
+}
+
+
+/* Shared marketplace surface palette. */
+.fm-surface { background: var(--fm-surface); border-color: var(--fm-border); }
+.fm-primary { background: var(--fm-primary); color: #fff; }
+.fm-primary:hover { background: #15803d; }
+
+
+/* Classes kept outside compiled Tailwind so late project changes remain offline. */
+.fm-sidebar-bg { background-color: var(--fm-sidebar) !important; }
+input[type="radio"], input[type="checkbox"] { accent-color: var(--fm-primary); }

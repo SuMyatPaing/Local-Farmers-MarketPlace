@@ -1,0 +1,11 @@
+# Runtime/user uploads
+uploads/payment_slips/*
+
+# Local secrets / logs
+.env
+*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
